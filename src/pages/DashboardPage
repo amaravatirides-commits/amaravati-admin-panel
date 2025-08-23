@@ -1,0 +1,32 @@
+// src/pages/DashboardPage.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./DashboardPage.css"; // optional CSS for styling
+
+function DashboardPage() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken"); // clear token
+    navigate("/"); // go back to login
+  };
+
+  return (
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <h1>AmaravatiRides Admin Dashboard</h1>
+        <button onClick={handleLogout} className="logout-btn">
+          Logout
+        </button>
+      </header>
+
+      <main className="dashboard-main">
+        <div className="card">📌 Manage Users</div>
+        <div className="card">🚖 Manage Drivers</div>
+        <div className="card">🛣️ Manage Rides</div>
+      </main>
+    </div>
+  );
+}
+
+export default DashboardPage;
