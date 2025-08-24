@@ -1,11 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
+// Pages
 import LoginPage from "./pages/LoginPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import UsersPage from "./pages/UsersPage.jsx";
 import DriversPage from "./pages/DriversPage.jsx";
 import RidesPage from "./pages/RidesPage.jsx";
+
+// Components
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {

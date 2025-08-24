@@ -1,7 +1,7 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // make sure this file exists
+import "./LoginPage.css"; // Ensure this CSS file exists for styling
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,7 +15,7 @@ function LoginPage() {
 
     try {
       const res = await fetch(
-        "https://amaravati-backend-cj4n.onrender.com/api/admin/login", // live backend
+        `${process.env.REACT_APP_API_URL}/api/admin/login`, // Use environment variable
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ function LoginPage() {
       const data = await res.json();
 
       if (res.ok && data.token) {
-        // Save token
+        // Save token in localStorage
         localStorage.setItem("adminToken", data.token);
         // Redirect to dashboard
         navigate("/dashboard");
@@ -55,7 +55,6 @@ function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             type="password"
             placeholder="Enter Password"
@@ -63,7 +62,6 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
           <button type="submit">Login</button>
         </form>
       </div>
