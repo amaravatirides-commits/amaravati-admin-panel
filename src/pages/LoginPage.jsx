@@ -1,7 +1,7 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // Ensure this CSS file exists for styling
+import "./LoginPage.css";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,27 +14,22 @@ function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/admin/login`, // Use environment variable
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
 
       if (res.ok && data.token) {
-        // Save token in localStorage
         localStorage.setItem("adminToken", data.token);
-        // Redirect to dashboard
         navigate("/dashboard");
       } else {
         setError(data.message || "Invalid email or password");
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error(err);
       setError("Unable to connect. Please try again.");
     }
   };
@@ -44,9 +39,7 @@ function LoginPage() {
       <div className="login-box">
         <img src="/logo192.png" alt="Logo" className="login-logo" />
         <h2>AmaravatiRides Admin Login</h2>
-
         {error && <p className="error">{error}</p>}
-
         <form onSubmit={handleLogin}>
           <input
             type="email"
