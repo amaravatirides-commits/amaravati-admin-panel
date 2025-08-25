@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
@@ -13,41 +12,33 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Default redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Public route */}
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <UsersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/drivers"
-          element={
-            <ProtectedRoute>
-              <DriversPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rides"
-          element={
-            <ProtectedRoute>
-              <RidesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+
+        {/* Protected routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }/>
+        <Route path="/users" element={
+          <ProtectedRoute>
+            <UsersPage />
+          </ProtectedRoute>
+        }/>
+        <Route path="/drivers" element={
+          <ProtectedRoute>
+            <DriversPage />
+          </ProtectedRoute>
+        }/>
+        <Route path="/rides" element={
+          <ProtectedRoute>
+            <RidesPage />
+          </ProtectedRoute>
+        }/>
       </Routes>
     </Router>
   );

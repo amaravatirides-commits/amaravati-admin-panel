@@ -1,12 +1,10 @@
-// src/api.js
 import axios from "axios";
 
-// Create axios instance with base URL
 const api = axios.create({
-  baseURL: "https://amaravati-backend-cj4n.onrender.com/api",
+  baseURL: "http://localhost:5000/api",
 });
 
-// Automatically attach token if available
+// Add token automatically if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");

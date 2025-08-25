@@ -1,16 +1,13 @@
-/* Top bar: Search + filters + rows per page */
+/* Search bar + rows per page */
 .top-bar {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .top-bar input {
   padding: 6px;
   width: 50%;
-  min-width: 150px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -21,9 +18,9 @@
   border-radius: 4px;
 }
 
-/* Table container */
+/* Table styling */
 .table-container {
-  overflow-x: auto; /* responsive */
+  overflow-x: auto; /* makes it responsive */
 }
 
 .rides-table {
@@ -57,7 +54,6 @@
   margin-right: 5px;
   border-radius: 4px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .btn-delete {
@@ -67,7 +63,6 @@
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .btn-edit:hover {
@@ -91,11 +86,6 @@
   background: white;
   cursor: pointer;
   border-radius: 4px;
-  transition: 0.2s;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #f0f0f0;
 }
 
 .pagination button:disabled {
@@ -114,7 +104,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .modal-content {
@@ -122,31 +111,10 @@
   padding: 20px;
   border-radius: 6px;
   width: 300px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 15px;
-}
-
-.modal-content label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.modal-content select,
-.modal-content input {
-  width: 100%;
-  padding: 6px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
 
 .modal-buttons {
+  margin-top: 15px;
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
 }

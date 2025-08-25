@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout.jsx";
 import axios from "axios";
 import "./RidesPage.css";
-import { BASE_URL, getAuthHeaders } from "../config.js";
 
 // Status badge colors
 const STATUS_COLORS = {
@@ -42,13 +41,13 @@ function RidesPage() {
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/admin/rides`, {
-          headers: getAuthHeaders(),
+        const token = localStorage.getItem("adminToken");
+        const res = await axios.get("http://localhost:5000/api/admin/rides", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         setRides(res.data);
       } catch (error) {
         console.error("Error fetching rides:", error);
-        alert("Failed to fetch rides");
       } finally {
         setLoading(false);
       }
@@ -56,14 +55,16 @@ function RidesPage() {
     fetchRides();
   }, []);
 
+  // Total earnings
   const totalEarnings = rides.reduce((sum, ride) => sum + (ride.fare || 0), 0);
 
   // Delete ride
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this ride?")) return;
     try {
-      await axios.delete(`${BASE_URL}/admin/rides/${id}`, {
-        headers: getAuthHeaders(),
+      const token = localStorage.getItem("adminToken");
+      await axios.delete(`http://localhost:5000/api/admin/rides/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setRides(rides.filter((ride) => ride._id !== id));
     } catch (err) {
@@ -80,12 +81,13 @@ function RidesPage() {
 
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem("adminToken");
       const res = await axios.put(
-        `${BASE_URL}/admin/rides/${editingRide._id}`,
+        `http://localhost:5000/api/admin/rides/${editingRide._id}`,
         { status: editStatus },
-        { headers: getAuthHeaders() }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setRides(rides.map((r) => (r._id === res.data._id ? res.data : r)));
+      setRides(rides.map((r) => (r._id === res.data.data._id ? res.data.data : r)));
       setEditingRide(null);
     } catch (err) {
       console.error(err);
@@ -117,14 +119,7 @@ function RidesPage() {
 
       {/* Total Earnings */}
       <div style={{ marginBottom: "20px" }}>
-        <div
-          style={{
-            backgroundColor: "#e8f5e9",
-            padding: "10px 20px",
-            borderRadius: "8px",
-            display: "inline-block",
-          }}
-        >
+        <div style={{ backgroundColor: "#e8f5e9", padding: "10px 20px", borderRadius: "8px", display: "inline-block" }}>
           <strong>Total Earnings: </strong> ₹{totalEarnings}
         </div>
       </div>
@@ -258,8 +253,8 @@ function RidesPage() {
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
-            <div className="modal-buttons" style={{ marginTop: "10px" }}>
-              <button onClick={handleSave} style={{ marginRight: "10px" }}>Save</button>
+            <div className="modal-buttons">
+              <button onClick={handleSave}>Save</button>
               <button onClick={() => setEditingRide(null)}>Cancel</button>
             </div>
           </div>

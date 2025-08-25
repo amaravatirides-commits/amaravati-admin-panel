@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import "./DriversPage.css";
-import { BASE_URL, getAuthHeaders } from "../config.js";
 
 // Vehicle icons
 const VEHICLE_ICONS = {
@@ -32,18 +31,18 @@ function DriversPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Fetch drivers from live backend
+  // Fetch drivers
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/admin/drivers`, {
-          headers: getAuthHeaders(),
+        const token = localStorage.getItem("adminToken");
+        const res = await axios.get("http://localhost:5000/api/admin/drivers", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         setDrivers(res.data);
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching drivers:", err);
-        alert("Failed to fetch drivers");
-      } finally {
         setLoading(false);
       }
     };
@@ -54,8 +53,9 @@ function DriversPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this driver?")) return;
     try {
-      await axios.delete(`${BASE_URL}/admin/drivers/${id}`, {
-        headers: getAuthHeaders(),
+      const token = localStorage.getItem("adminToken");
+      await axios.delete(`http://localhost:5000/api/admin/drivers/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setDrivers(drivers.filter((d) => d._id !== id));
     } catch (err) {
@@ -75,10 +75,11 @@ function DriversPage() {
   // Save edited driver
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem("adminToken");
       const res = await axios.put(
-        `${BASE_URL}/admin/drivers/${editingDriver._id}`,
+        `http://localhost:5000/api/admin/drivers/${editingDriver._id}`,
         { name: editName, email: editEmail, vehicleType: editVehicle },
-        { headers: getAuthHeaders() }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setDrivers(drivers.map((d) => (d._id === res.data._id ? res.data : d)));
       setEditingDriver(null);

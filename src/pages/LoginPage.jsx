@@ -1,7 +1,6 @@
-// src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import "./LoginPage.css"; // Make sure this exists
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,7 +13,7 @@ function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/login`, {
+      const res = await fetch("http://localhost:5000/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -22,15 +21,15 @@ function LoginPage() {
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
+      if (res.ok) {
         localStorage.setItem("adminToken", data.token);
         navigate("/dashboard");
       } else {
-        setError(data.message || "Invalid email or password");
+        setError(data.message || "Login failed");
       }
     } catch (err) {
       console.error(err);
-      setError("Unable to connect. Please try again.");
+      setError("Login failed. Please check your credentials.");
     }
   };
 
@@ -39,7 +38,9 @@ function LoginPage() {
       <div className="login-box">
         <img src="/logo192.png" alt="Logo" className="login-logo" />
         <h2>AmaravatiRides Admin Login</h2>
+
         {error && <p className="error">{error}</p>}
+
         <form onSubmit={handleLogin}>
           <input
             type="email"

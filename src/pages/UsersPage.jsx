@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import "./UsersPage.css";
-import { BASE_URL, getAuthHeaders } from "../config.js";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -17,12 +16,13 @@ function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Fetch users from live backend
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/admin/users`, {
-          headers: getAuthHeaders(),
+        const token = localStorage.getItem("adminToken");
+        const res = await axios.get("http://localhost:5000/api/admin/users", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(res.data);
       } catch (err) {
@@ -39,8 +39,9 @@ function UsersPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`${BASE_URL}/admin/users/${id}`, {
-        headers: getAuthHeaders(),
+      const token = localStorage.getItem("adminToken");
+      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(users.filter((user) => user._id !== id));
     } catch (err) {
@@ -59,10 +60,11 @@ function UsersPage() {
   // Save edited user
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem("adminToken");
       const res = await axios.put(
-        `${BASE_URL}/admin/users/${editingUser._id}`,
+        `http://localhost:5000/api/admin/users/${editingUser._id}`,
         { name: editName, email: editEmail },
-        { headers: getAuthHeaders() }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setUsers(users.map((u) => (u._id === res.data._id ? res.data : u)));
       setEditingUser(null);
