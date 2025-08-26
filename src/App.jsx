@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate
+} from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
@@ -10,7 +15,12 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <Routes>
         {/* Default redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -19,26 +29,38 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
 
         {/* Protected routes */}
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }/>
-        <Route path="/users" element={
-          <ProtectedRoute>
-            <UsersPage />
-          </ProtectedRoute>
-        }/>
-        <Route path="/drivers" element={
-          <ProtectedRoute>
-            <DriversPage />
-          </ProtectedRoute>
-        }/>
-        <Route path="/rides" element={
-          <ProtectedRoute>
-            <RidesPage />
-          </ProtectedRoute>
-        }/>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/drivers"
+          element={
+            <ProtectedRoute>
+              <DriversPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rides"
+          element={
+            <ProtectedRoute>
+              <RidesPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
