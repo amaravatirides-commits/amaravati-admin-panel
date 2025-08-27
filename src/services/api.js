@@ -1,6 +1,7 @@
 import axios from "axios";
 
-// This baseURL must be your live Render URL for Netlify
+// This baseURL points directly to your live backend on Render.
+// This is the correct code for your Netlify website to work.
 const api = axios.create({
   baseURL: "https://amaravati-backend-cj4n.onrender.com/api",
 });
