@@ -1,8 +1,8 @@
 import axios from "axios";
 
+// This baseURL must be your live Render URL for Netlify
 const api = axios.create({
-  // This baseURL must be localhost to connect to your local backend
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://amaravati-backend-cj4n.onrender.com/api",
 });
 
 // Add token automatically if available
