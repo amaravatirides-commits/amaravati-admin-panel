@@ -1,11 +1,10 @@
+// src/api/api.js
 import axios from "axios";
 
-// Base URL pointing to your Render backend
 const api = axios.create({
-  baseURL: "https://amaravati-backend-cj4n.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ now it uses .env / Netlify variable
 });
 
-// Automatically attach token if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");
