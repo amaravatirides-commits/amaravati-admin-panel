@@ -13,7 +13,7 @@ import {
   Line,
   CartesianGrid,
 } from "recharts";
-import axios from "axios";
+import api from "../api/api"; // centralized API with token handling
 
 // Vehicle icons
 const VEHICLE_ICONS = {
@@ -40,13 +40,10 @@ function DashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
-        const headers = { Authorization: `Bearer ${token}` };
-
         const [usersRes, driversRes, ridesRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/users", { headers }),
-          axios.get("http://localhost:5000/api/admin/drivers", { headers }),
-          axios.get("http://localhost:5000/api/admin/rides", { headers }),
+          api.get("/admin/users"),
+          api.get("/admin/drivers"),
+          api.get("/admin/rides"),
         ]);
 
         const rides = ridesRes.data;

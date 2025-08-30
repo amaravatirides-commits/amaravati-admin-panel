@@ -1,8 +1,9 @@
 // src/pages/DriversPage.jsx
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import axios from "axios";
+import api from "../api/api"; // centralized API instance
 import "./DriversPage.css";
+import { FaEdit, FaTrash, FaCircle } from "react-icons/fa";
 
 // Vehicle icons
 const VEHICLE_ICONS = {
@@ -21,13 +22,15 @@ const VEHICLE_ICONS = {
 function DriversPage() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Edit modal state
   const [editingDriver, setEditingDriver] = useState(null);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editVehicle, setEditVehicle] = useState("");
-  const [search, setSearch] = useState("");
 
-  // Pagination
+  // Search + pagination state
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -35,14 +38,12 @@ function DriversPage() {
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
-        const res = await axios.get("http://localhost:5000/api/admin/drivers", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/admin/drivers");
         setDrivers(res.data);
-        setLoading(false);
       } catch (err) {
         console.error("Error fetching drivers:", err);
+        alert("Failed to fetch drivers");
+      } finally {
         setLoading(false);
       }
     };
@@ -53,10 +54,7 @@ function DriversPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this driver?")) return;
     try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/api/admin/drivers/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/admin/drivers/${id}`);
       setDrivers(drivers.filter((d) => d._id !== id));
     } catch (err) {
       console.error(err);
@@ -75,12 +73,11 @@ function DriversPage() {
   // Save edited driver
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const res = await axios.put(
-        `http://localhost:5000/api/admin/drivers/${editingDriver._id}`,
-        { name: editName, email: editEmail, vehicleType: editVehicle },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.put(`/admin/drivers/${editingDriver._id}`, {
+        name: editName,
+        email: editEmail,
+        vehicleType: editVehicle,
+      });
       setDrivers(drivers.map((d) => (d._id === res.data._id ? res.data : d)));
       setEditingDriver(null);
     } catch (err) {
@@ -91,21 +88,15 @@ function DriversPage() {
 
   if (loading) return <p>Loading drivers...</p>;
 
-  // Filter drivers by search
-  const filteredDrivers = drivers.filter(
-    (driver) =>
-      [
-        driver.name,
-        driver.email,
-        driver.vehicleType,
-        driver.isOnline ? "online" : "offline",
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase())
+  // Filter by search
+  const filteredDrivers = drivers.filter((driver) =>
+    [driver.name, driver.email, driver.vehicleType, driver.isOnline ? "online" : "offline"]
+      .join(" ")
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
-  // Pagination calculations
+  // Pagination
   const indexOfLastDriver = currentPage * rowsPerPage;
   const indexOfFirstDriver = indexOfLastDriver - rowsPerPage;
   const currentDrivers = filteredDrivers.slice(indexOfFirstDriver, indexOfLastDriver);
@@ -116,13 +107,12 @@ function DriversPage() {
       <h1>Drivers Management</h1>
 
       {/* Search + Rows per page */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+      <div className="toolbar">
         <input
           type="text"
           placeholder="Search drivers..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ padding: "5px", width: "200px" }}
         />
         <div>
           <label>Rows per page: </label>
@@ -140,10 +130,11 @@ function DriversPage() {
         </div>
       </div>
 
+      {/* Drivers Table */}
       {currentDrivers.length === 0 ? (
         <p>No drivers found.</p>
       ) : (
-        <table border="1" cellPadding="10" style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table>
           <thead>
             <tr>
               <th>ID</th>
@@ -163,16 +154,24 @@ function DriversPage() {
                 <td>
                   {driver.vehicleType ? (
                     <span title={driver.vehicleType}>
-                      {VEHICLE_ICONS[driver.vehicleType.toLowerCase()] || "❓"} {driver.vehicleType}
+                      {VEHICLE_ICONS[driver.vehicleType.toLowerCase()] || "❓"}{" "}
+                      {driver.vehicleType}
                     </span>
-                  ) : "N/A"}
+                  ) : (
+                    "N/A"
+                  )}
                 </td>
-                <td style={{ color: driver.isOnline ? "green" : "red", fontWeight: "bold" }}>
+                <td className={driver.isOnline ? "online" : "offline"}>
+                  <FaCircle className="status-icon" />{" "}
                   {driver.isOnline ? "Online" : "Offline"}
                 </td>
                 <td>
-                  <button onClick={() => handleEdit(driver)} className="btn-edit">Edit</button>
-                  <button onClick={() => handleDelete(driver._id)} className="btn-delete">Delete</button>
+                  <button onClick={() => handleEdit(driver)} className="btn-edit">
+                    <FaEdit /> Edit
+                  </button>
+                  <button onClick={() => handleDelete(driver._id)} className="btn-delete">
+                    <FaTrash /> Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -180,11 +179,17 @@ function DriversPage() {
         </table>
       )}
 
-      {/* Pagination controls */}
-      <div style={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
-        <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>Prev</button>
-        <span style={{ margin: "0 10px" }}>Page {currentPage} of {totalPages}</span>
-        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
+      {/* Pagination */}
+      <div className="pagination">
+        <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+          Prev
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+          Next
+        </button>
       </div>
 
       {/* Edit Modal */}
@@ -197,21 +202,15 @@ function DriversPage() {
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              style={{ marginBottom: "10px", width: "100%" }}
             />
             <label>Email:</label>
             <input
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              style={{ marginBottom: "10px", width: "100%" }}
             />
             <label>Vehicle Type:</label>
-            <select
-              value={editVehicle}
-              onChange={(e) => setEditVehicle(e.target.value)}
-              style={{ marginBottom: "10px", width: "100%" }}
-            >
+            <select value={editVehicle} onChange={(e) => setEditVehicle(e.target.value)}>
               <option value="">Select Vehicle</option>
               <option value="bike">Bike</option>
               <option value="car">Car</option>

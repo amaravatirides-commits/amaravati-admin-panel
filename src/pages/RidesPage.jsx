@@ -1,7 +1,7 @@
 // src/pages/RidesPage.jsx
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout.jsx";
-import axios from "axios";
+import api from "../api/api"; // ✅ centralized API instance
 import "./RidesPage.css";
 
 // Status badge colors
@@ -41,13 +41,11 @@ function RidesPage() {
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
-        const res = await axios.get("http://localhost:5000/api/admin/rides", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/admin/rides");
         setRides(res.data);
       } catch (error) {
         console.error("Error fetching rides:", error);
+        alert("Failed to fetch rides");
       } finally {
         setLoading(false);
       }
@@ -62,10 +60,7 @@ function RidesPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this ride?")) return;
     try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/api/admin/rides/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/admin/rides/${id}`);
       setRides(rides.filter((ride) => ride._id !== id));
     } catch (err) {
       console.error(err);
@@ -81,12 +76,7 @@ function RidesPage() {
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const res = await axios.put(
-        `http://localhost:5000/api/admin/rides/${editingRide._id}`,
-        { status: editStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.put(`/admin/rides/${editingRide._id}`, { status: editStatus });
       setRides(rides.map((r) => (r._id === res.data.data._id ? res.data.data : r)));
       setEditingRide(null);
     } catch (err) {
@@ -101,7 +91,13 @@ function RidesPage() {
   const filteredRides = rides.filter(
     (ride) =>
       (!vehicleFilter || ride.vehicleType?.toLowerCase() === vehicleFilter) &&
-      [ride.user?.email, ride.driver?.email, ride.pickupLocation?.coordinates.join(","), ride.dropLocation?.coordinates.join(","), ride.status]
+      [
+        ride.user?.email,
+        ride.driver?.email,
+        ride.pickupLocation?.coordinates.join(","),
+        ride.dropLocation?.coordinates.join(","),
+        ride.status,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase())
@@ -119,7 +115,14 @@ function RidesPage() {
 
       {/* Total Earnings */}
       <div style={{ marginBottom: "20px" }}>
-        <div style={{ backgroundColor: "#e8f5e9", padding: "10px 20px", borderRadius: "8px", display: "inline-block" }}>
+        <div
+          style={{
+            backgroundColor: "#e8f5e9",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            display: "inline-block",
+          }}
+        >
           <strong>Total Earnings: </strong> ₹{totalEarnings}
         </div>
       </div>

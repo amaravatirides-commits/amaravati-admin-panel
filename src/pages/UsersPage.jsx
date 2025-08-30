@@ -1,7 +1,7 @@
 // src/pages/UsersPage.jsx
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import axios from "axios";
+import api from "../api/api"; // ✅ centralized API instance
 import "./UsersPage.css";
 
 function UsersPage() {
@@ -20,10 +20,7 @@ function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
-        const res = await axios.get("http://localhost:5000/api/admin/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/admin/users");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -39,10 +36,7 @@ function UsersPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/admin/users/${id}`);
       setUsers(users.filter((user) => user._id !== id));
     } catch (err) {
       console.error(err);
@@ -60,12 +54,10 @@ function UsersPage() {
   // Save edited user
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const res = await axios.put(
-        `http://localhost:5000/api/admin/users/${editingUser._id}`,
-        { name: editName, email: editEmail },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.put(`/admin/users/${editingUser._id}`, {
+        name: editName,
+        email: editEmail,
+      });
       setUsers(users.map((u) => (u._id === res.data._id ? res.data : u)));
       setEditingUser(null);
     } catch (err) {
