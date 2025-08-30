@@ -1,8 +1,10 @@
-// src/api/api.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ now it uses .env / Netlify variable
+  baseURL: import.meta.env.VITE_API_BASE_URL,  // ✅ no localhost
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use(
