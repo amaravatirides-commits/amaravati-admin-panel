@@ -1,15 +1,14 @@
-// src/api/api.js
 import axios from "axios";
 
-// Create Axios instance with backend API URL
+// Base URL from environment variable
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ Must match Netlify env variable
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Attach token automatically if available
+// Automatically attach token if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");
