@@ -15,7 +15,6 @@ import {
 } from "recharts";
 import api from "../api/api"; // centralized API with token handling
 
-// Vehicle icons
 const VEHICLE_ICONS = {
   bike: "🏍️",
   car: "🚗",
@@ -46,8 +45,9 @@ function DashboardPage() {
           api.get("/admin/rides"),
         ]);
 
-        const rides = ridesRes.data;
+        const users = usersRes.data;
         const drivers = driversRes.data;
+        const rides = ridesRes.data;
 
         // Vehicle type counts
         const vehicleCounts = {};
@@ -56,7 +56,9 @@ function DashboardPage() {
           vehicleCounts[type] = (vehicleCounts[type] || 0) + 1;
         });
         const vehicleData = Object.keys(vehicleCounts).map((key) => ({
-          vehicle: `${VEHICLE_ICONS[key] || "❓"} ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+          vehicle: `${VEHICLE_ICONS[key] || "❓"} ${
+            key.charAt(0).toUpperCase() + key.slice(1)
+          }`,
           count: vehicleCounts[key],
         }));
 
@@ -71,7 +73,8 @@ function DashboardPage() {
         // Daily rides & earnings
         const ridesDaily = last7Days.map((date) => ({
           date,
-          count: rides.filter((ride) => ride.createdAt?.split("T")[0] === date).length,
+          count: rides.filter((ride) => ride.createdAt?.split("T")[0] === date)
+            .length,
         }));
 
         const earningsDaily = last7Days.map((date) => ({
@@ -87,10 +90,15 @@ function DashboardPage() {
           online: driver.isOnline ? 1 : 0,
         }));
 
-        // Driver analytics: rides per driver & earnings per driver
+        // Driver analytics
         const driverStatsData = drivers.map((driver) => {
-          const driverRides = rides.filter((ride) => ride.driver?._id === driver._id);
-          const totalEarnings = driverRides.reduce((sum, r) => sum + (r.fare || 0), 0);
+          const driverRides = rides.filter(
+            (ride) => ride.driver?._id === driver._id
+          );
+          const totalEarnings = driverRides.reduce(
+            (sum, r) => sum + (r.fare || 0),
+            0
+          );
           return {
             name: driver.name || driver.email,
             rides: driverRides.length,
@@ -98,11 +106,7 @@ function DashboardPage() {
           };
         });
 
-        setStats({
-          users: usersRes.data.length,
-          drivers: drivers.length,
-          rides: rides.length,
-        });
+        setStats({ users: users.length, drivers: drivers.length, rides: rides.length });
         setVehicleStats(vehicleData);
         setDailyRides(ridesDaily);
         setDailyEarnings(earningsDaily);
@@ -149,6 +153,7 @@ function DashboardPage() {
         </Grid>
       </Grid>
 
+      {/* Vehicle Type Chart */}
       <Typography variant="h5" gutterBottom style={{ marginTop: "30px" }}>
         Rides by Vehicle Type
       </Typography>
@@ -163,12 +168,16 @@ function DashboardPage() {
         </ResponsiveContainer>
       )}
 
+      {/* Daily Rides Chart */}
       <Typography variant="h5" gutterBottom style={{ marginTop: "30px" }}>
         Daily Rides (Last 7 Days)
       </Typography>
       {dailyRides.length > 0 && (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={dailyRides} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+          <LineChart
+            data={dailyRides}
+            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis allowDecimals={false} />
@@ -178,12 +187,16 @@ function DashboardPage() {
         </ResponsiveContainer>
       )}
 
+      {/* Daily Earnings Chart */}
       <Typography variant="h5" gutterBottom style={{ marginTop: "30px" }}>
         Daily Earnings (Last 7 Days)
       </Typography>
       {dailyEarnings.length > 0 && (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={dailyEarnings} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+          <LineChart
+            data={dailyEarnings}
+            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
@@ -193,6 +206,7 @@ function DashboardPage() {
         </ResponsiveContainer>
       )}
 
+      {/* Active Drivers Chart */}
       <Typography variant="h5" gutterBottom style={{ marginTop: "30px" }}>
         Active Drivers
       </Typography>
@@ -207,12 +221,17 @@ function DashboardPage() {
         </ResponsiveContainer>
       )}
 
+      {/* Driver Analytics */}
       <Typography variant="h5" gutterBottom style={{ marginTop: "30px" }}>
         Driver Analytics (Rides & Earnings)
       </Typography>
       {driverStats.length > 0 && (
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={driverStats} margin={{ top: 20, right: 30, left: 0, bottom: 5 }} layout="vertical">
+          <BarChart
+            data={driverStats}
+            layout="vertical"
+            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" />
             <YAxis type="category" dataKey="name" width={150} />

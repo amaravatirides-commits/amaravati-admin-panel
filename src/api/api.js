@@ -1,8 +1,11 @@
 import axios from "axios";
 
-// Base URL pointing to your Render backend
+// Base URL from environment variable
 const api = axios.create({
-  baseURL: "https://amaravati-backend-cj4n.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Automatically attach token if available

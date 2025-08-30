@@ -1,6 +1,8 @@
+// src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // Make sure this exists
+import api from "../api/api"; // Correct path to your api.js
+import "./LoginPage.css";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,23 +15,21 @@ function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // Call backend using Axios instance
+      const res = await api.post("/admin/login", { email, password });
 
-      const data = await res.json();
+      // Save JWT token in localStorage
+      localStorage.setItem("adminToken", res.data.token);
 
-      if (res.ok) {
-        localStorage.setItem("adminToken", data.token);
-        navigate("/dashboard");
-      } else {
-        setError(data.message || "Login failed");
-      }
+      // Redirect to dashboard
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      setError("Login failed. Please check your credentials.");
+      if (err.response && err.response.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Login failed. Please check your credentials.");
+      }
     }
   };
 
